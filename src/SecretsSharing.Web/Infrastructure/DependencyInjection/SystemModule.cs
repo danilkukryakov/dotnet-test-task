@@ -1,6 +1,7 @@
 using SecretsSharing.Infrastructure.Abstractions;
 using SecretsSharing.Infrastructure.DataAccess;
 using SecretsSharing.Web.Infrastructure.Jwt;
+using SecretsSharing.Web.Infrastructure.Web;
 
 namespace SecretsSharing.Web.Infrastructure.DependencyInjection;
 
@@ -17,5 +18,6 @@ internal static class SystemModule
     {
         services.AddScoped<IAuthenticationTokenService, SystemJwtTokenService>();
         services.AddScoped<IAppDbContext, AppDbContext>();
+        services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
     }
 }

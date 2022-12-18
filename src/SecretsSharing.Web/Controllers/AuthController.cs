@@ -32,7 +32,6 @@ public class AuthController : ControllerBase
     [HttpPost]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    [ProducesResponseType(404)]
     public async Task Register([Required] RegisterUserDto register, CancellationToken cancellationToken)
         => await mediator.Send(new RegisterUserCommand { RegisterDto = register }, cancellationToken);
 

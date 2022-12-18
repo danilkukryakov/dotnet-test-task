@@ -24,7 +24,7 @@ public class Link
     /// So this id will point to entity in table according to the SecretType.
     /// </summary>
     [Required]
-    public Guid SecretId { get; set; } = Guid.NewGuid();
+    public required Guid SecretId { get; set; }
 
     /// <summary>
     /// Secret type.
