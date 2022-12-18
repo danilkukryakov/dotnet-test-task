@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  ###
+  # Postgres main database
+  postgres:
+    hostname: secretsh-sharing-db
+    container_name: secretsh-sharing-db
+    image: postgres:15.1
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=1

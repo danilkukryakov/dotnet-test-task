@@ -6,7 +6,7 @@ namespace SecretsSharing.Infrastructure.Abstractions;
 /// <summary>
 /// Abstraction of application DB context unit of work.
 /// </summary>
-public interface IAppDbContext : IDisposable
+public interface IAppDbContext : IDbContextWithSets, IDisposable
 {
     /// <summary>
     /// Users.
@@ -24,7 +24,7 @@ public interface IAppDbContext : IDisposable
     DbSet<SecretFile> SecretFiles { get; }
 
     /// <summary>
-    /// Secret files.
+    /// Secret text.
     /// </summary>
     DbSet<SecretText> SecretTexts { get; }
 }

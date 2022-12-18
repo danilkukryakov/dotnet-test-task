@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SecretsSharing.Web.Controllers;
@@ -7,6 +8,7 @@ namespace SecretsSharing.Web.Controllers;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
