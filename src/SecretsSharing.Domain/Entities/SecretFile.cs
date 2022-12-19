@@ -17,19 +17,19 @@ public class SecretFile
     /// </summary>
     [Required]
     [MaxLength(255)]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 
     /// <summary>
     /// MIME type for file.
     /// </summary>
     [Required]
     [MaxLength(255)]
-    public string MimeType { get; set; } = string.Empty;
+    public required string MimeType { get; set; }
 
     /// <summary>
     /// Reference to file at storage.
     /// </summary>
     [Required]
     [MaxLength(255)]
-    public string BlobRef { get; set; } = string.Empty;
+    public required string BlobRef { get; set; }
 }
