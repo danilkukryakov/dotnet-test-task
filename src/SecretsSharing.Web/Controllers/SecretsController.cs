@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecretsSharing.UseCases.Secrets.CreateFileSecret;
 using SecretsSharing.UseCases.Secrets.CreateTextSecret;
-using SecretsSharing.Domain.Entities;
+using SecretsSharing.UseCases.Secrets.GetSecretContent;
 
 namespace SecretsSharing.Web.Controllers;
 
@@ -25,6 +25,18 @@ public class SecretsController : ControllerBase
     {
         this.mediator = mediator;
     }
+
+    /// <summary>
+    /// Create new text secret.
+    /// </summary>
+    /// <param name="id">Link id.</param>
+    /// <param name="cancellationToken">Token to monitor request cancellation.</param>
+    [HttpGet("{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [AllowAnonymous]
+    public async Task<GetSecretContentCommandResult> GetSecretContent(Guid id, CancellationToken cancellationToken)
+        => await mediator.Send(new GetSecretContentCommand { SecretLinkId = id }, cancellationToken);
 
     /// <summary>
     /// Create new text secret.
@@ -50,12 +62,12 @@ public class SecretsController : ControllerBase
         bool deleteAfterDownload,
         CancellationToken cancellationToken)
             => (await mediator.Send(new CreateFileSecretCommand
+            {
+                FileSecretDto = new CreateFileSecretDto
                 {
-                    FileSecretDto = new CreateFileSecretDto
-                    {
-                        File = file,
-                        DeleteAfterDownload = deleteAfterDownload,
-                    }
-                },
+                    File = file,
+                    DeleteAfterDownload = deleteAfterDownload,
+                }
+            },
                 cancellationToken)).LinkId;
 }

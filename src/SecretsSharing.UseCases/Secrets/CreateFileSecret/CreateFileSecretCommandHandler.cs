@@ -7,7 +7,7 @@ namespace SecretsSharing.UseCases.Secrets.CreateFileSecret;
 /// <summary>
 /// Handler for <see cref="CreateFileSecretCommand" />.
 /// </summary>
-internal class CreateTextSecretCommandHandler : IRequestHandler<CreateFileSecretCommand, CreateFileSecretCommandResult>
+internal class CreateFileSecretCommandHandler : IRequestHandler<CreateFileSecretCommand, CreateFileSecretCommandResult>
 {
     private readonly IAppDbContext dbContext;
     private readonly ICurrentUserAccessor currentUserAccessor;
@@ -15,7 +15,7 @@ internal class CreateTextSecretCommandHandler : IRequestHandler<CreateFileSecret
     /// <summary>
     /// Constructor.
     /// </summary>
-    public CreateTextSecretCommandHandler(IAppDbContext dbContext, ICurrentUserAccessor currentUserAccessor)
+    public CreateFileSecretCommandHandler(IAppDbContext dbContext, ICurrentUserAccessor currentUserAccessor)
     {
         this.dbContext = dbContext;
         this.currentUserAccessor = currentUserAccessor;

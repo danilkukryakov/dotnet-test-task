@@ -5,7 +5,7 @@ namespace SecretsSharing.UseCases.Secrets.CreateFileSecret;
 
 /// <summary>
 /// DTO for upload of file secret.
-/// /// </summary>
+/// </summary>
 public class CreateFileSecretDto
 {
     /// <summary>
