@@ -1,6 +1,7 @@
 using MediatR;
 using SecretsSharing.Infrastructure.Abstractions;
 using SecretsSharing.Domain.Entities;
+using SecretsSharing.UseCases.Secrets.DeleteSecret;
 
 namespace SecretsSharing.UseCases.Secrets.GetSecretContent;
 
@@ -10,13 +11,15 @@ namespace SecretsSharing.UseCases.Secrets.GetSecretContent;
 internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContentCommand, GetSecretContentCommandResult>
 {
     private readonly IAppDbContext dbContext;
+    private readonly IMediator mediator;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public GetSecretContentCommandHandler(IAppDbContext dbContext)
+    public GetSecretContentCommandHandler(IAppDbContext dbContext, IMediator mediator)
     {
         this.dbContext = dbContext;
+        this.mediator = mediator;
     }
 
     public async Task<GetSecretContentCommandResult> Handle(GetSecretContentCommand request, CancellationToken cancellationToken)
@@ -27,6 +30,28 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
             throw new NullReferenceException();
         }
 
+        var content = await GetSecretContent(link, cancellationToken);
+
+        var result = new GetSecretContentCommandResult
+        {
+            LinkId = link.Id,
+            Content = content,
+            SecretType = link.SecretType,
+        };
+
+        if (link.DeleteAfterDownload)
+        {
+            await mediator.Send(new DeleteSecretCommand
+            {
+                SecretLinkId = link.Id
+            }, CancellationToken.None);
+        }
+
+        return result;
+    }
+
+    private async Task<string> GetSecretContent(Link link, CancellationToken cancellationToken)
+    {
         string? resultContent = null;
 
         if (link.SecretType == SecretType.Text)
@@ -38,17 +63,11 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
             resultContent = (await dbContext.SecretFiles.FindAsync(new object?[] { link.SecretId, cancellationToken }, cancellationToken: cancellationToken))?.BlobRef;
         }
 
-        if (resultContent == null) {
+        if (resultContent == null)
+        {
             throw new NullReferenceException();
         }
 
-        // TODO: Add logic to delete file once it was read.
-
-        return new GetSecretContentCommandResult
-        {
-            LinkId = link.Id,
-            Content = resultContent,
-            SecretType = link.SecretType,
-        };
+        return resultContent;
     }
 }

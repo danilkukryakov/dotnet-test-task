@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecretsSharing.UseCases.Secrets.CreateFileSecret;
 using SecretsSharing.UseCases.Secrets.CreateTextSecret;
+using SecretsSharing.UseCases.Secrets.DeleteSecret;
 using SecretsSharing.UseCases.Secrets.GetSecretContent;
 
 namespace SecretsSharing.Web.Controllers;
@@ -27,7 +28,7 @@ public class SecretsController : ControllerBase
     }
 
     /// <summary>
-    /// Create new text secret.
+    /// Get secret content.
     /// </summary>
     /// <param name="id">Link id.</param>
     /// <param name="cancellationToken">Token to monitor request cancellation.</param>
@@ -68,6 +69,17 @@ public class SecretsController : ControllerBase
                     File = file,
                     DeleteAfterDownload = deleteAfterDownload,
                 }
-            },
-                cancellationToken)).LinkId;
+            }, cancellationToken)).LinkId;
+
+    /// <summary>
+    /// Remove secret link.
+    /// </summary>
+    /// <param name="id">Secret link id.</param>
+    /// <param name="cancellationToken">Cancellation token to cancel the request.</param>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task Delete(Guid id, CancellationToken cancellationToken)
+        => await mediator.Send(new DeleteSecretCommand { SecretLinkId = id }, cancellationToken);
 }
