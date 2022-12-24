@@ -33,6 +33,8 @@ internal class SwaggerGenOptionsSetup
         options.IncludeXmlComments(GetAssemblyLocationByType(GetType()));
 
         // Operation filters.
+        options.SchemaFilter<SwaggerEnumDescriptionSchemaOperationFilter>();
+        options.OperationFilter<SwaggerEnumDescriptionSchemaOperationFilter>();
         options.OperationFilter<SwaggerSecurityRequirementsOperationFilter>();
     }
 
