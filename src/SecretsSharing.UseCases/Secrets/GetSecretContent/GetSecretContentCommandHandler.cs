@@ -22,6 +22,7 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
         this.mediator = mediator;
     }
 
+    /// <inheritdoc />
     public async Task<GetSecretContentCommandResult> Handle(GetSecretContentCommand request, CancellationToken cancellationToken)
     {
         var link = await dbContext.Links.FindAsync(new object?[] { request.SecretLinkId, cancellationToken }, cancellationToken: cancellationToken);

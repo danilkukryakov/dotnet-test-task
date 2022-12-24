@@ -19,6 +19,7 @@ internal class DeleteSecretCommandHandler : AsyncRequestHandler<DeleteSecretComm
         this.dbContext = dbContext;
     }
 
+    /// <inheritdoc />
     protected override async Task Handle(DeleteSecretCommand request, CancellationToken cancellationToken)
     {
         var link = await dbContext.Links.FindAsync(new object?[] { request.SecretLinkId, cancellationToken }, cancellationToken: cancellationToken);

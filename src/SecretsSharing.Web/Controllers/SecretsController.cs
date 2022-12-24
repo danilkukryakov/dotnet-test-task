@@ -6,6 +6,7 @@ using SecretsSharing.UseCases.Secrets.CreateFileSecret;
 using SecretsSharing.UseCases.Secrets.CreateTextSecret;
 using SecretsSharing.UseCases.Secrets.DeleteSecret;
 using SecretsSharing.UseCases.Secrets.GetSecretContent;
+using SecretsSharing.UseCases.Secrets.GetUserSecretLinks;
 
 namespace SecretsSharing.Web.Controllers;
 
@@ -34,10 +35,19 @@ public class SecretsController : ControllerBase
     /// <param name="cancellationToken">Token to monitor request cancellation.</param>
     [HttpGet("{id}")]
     [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     [AllowAnonymous]
     public async Task<GetSecretContentCommandResult> GetSecretContent(Guid id, CancellationToken cancellationToken)
         => await mediator.Send(new GetSecretContentCommand { SecretLinkId = id }, cancellationToken);
+
+    /// <summary>
+    /// Get secret links for current user.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor request cancellation.</param>
+    [HttpGet]
+    [ProducesResponseType(200)]
+    public async Task<GetUserSecretLinksCommandResult> GetMySecretLinks(CancellationToken cancellationToken)
+        => await mediator.Send(new GetUserSecretLinksCommand(), cancellationToken);
 
     /// <summary>
     /// Create new text secret.
@@ -78,7 +88,6 @@ public class SecretsController : ControllerBase
     /// <param name="cancellationToken">Cancellation token to cancel the request.</param>
     [HttpDelete("{id}")]
     [ProducesResponseType(200)]
-    [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     public async Task Delete(Guid id, CancellationToken cancellationToken)
         => await mediator.Send(new DeleteSecretCommand { SecretLinkId = id }, cancellationToken);
