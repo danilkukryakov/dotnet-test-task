@@ -2,6 +2,7 @@ using MediatR;
 using SecretsSharing.Infrastructure.Abstractions;
 using SecretsSharing.Domain.Entities;
 using SecretsSharing.UseCases.Secrets.DeleteSecret;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SecretsSharing.UseCases.Secrets.GetSecretContent;
 
@@ -12,14 +13,17 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
 {
     private readonly IAppDbContext dbContext;
     private readonly IMediator mediator;
+    private readonly IBlobStorage blobStorage;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public GetSecretContentCommandHandler(IAppDbContext dbContext, IMediator mediator)
+    public GetSecretContentCommandHandler(IAppDbContext dbContext, IMediator mediator,
+        IBlobStorage blobStorage)
     {
         this.dbContext = dbContext;
         this.mediator = mediator;
+        this.blobStorage = blobStorage;
     }
 
     /// <inheritdoc />
@@ -31,14 +35,20 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
             throw new NullReferenceException();
         }
 
-        var content = await GetSecretContent(link, cancellationToken);
-
         var result = new GetSecretContentCommandResult
         {
             LinkId = link.Id,
-            Content = content,
             SecretType = link.SecretType,
         };
+
+        if (link.SecretType == SecretType.Text)
+        {
+            result.TextContent = await GetTextSecretContent(link, cancellationToken);
+        }
+        else if (link.SecretType == SecretType.File)
+        {
+            result.FileStream = await GetFileSecretContent(link, cancellationToken);
+        }
 
         if (link.DeleteAfterDownload)
         {
@@ -46,31 +56,38 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
             {
                 SecretLinkId = link.Id
             }, CancellationToken.None);
-            // TODO: Add file remove from S3.
         }
 
         return result;
     }
 
-    private async Task<string> GetSecretContent(Link link, CancellationToken cancellationToken)
+    private async Task<string> GetTextSecretContent(Link link, CancellationToken cancellationToken)
     {
-        string? resultContent = null;
-
         if (link.SecretType == SecretType.Text)
         {
-            resultContent = (await dbContext.SecretTexts.FindAsync(new object?[] { link.SecretId, cancellationToken }, cancellationToken: cancellationToken))?.Content;
-        }
-        else if (link.SecretType == SecretType.File)
-        {
-            // TODO: Add S3 download link generation here.
-            resultContent = (await dbContext.SecretFiles.FindAsync(new object?[] { link.SecretId, cancellationToken }, cancellationToken: cancellationToken))?.BlobRef;
-        }
-
-        if (resultContent == null)
-        {
-            throw new NullReferenceException();
+            return (
+                await dbContext.SecretTexts.FindAsync(
+                    new object?[] { link.SecretId, cancellationToken },
+                    cancellationToken: cancellationToken)
+                )?.Content ?? string.Empty;
         }
 
-        return resultContent;
+        return string.Empty;
+    }
+
+    private async Task<FileStreamResult> GetFileSecretContent(Link link, CancellationToken cancellationToken)
+    {
+        var file = await dbContext.SecretFiles.FindAsync(new object?[] { link.SecretId, cancellationToken }, cancellationToken: cancellationToken);
+
+        if (file == null)
+        {
+            throw new Exception("File not found.");
+        }
+
+        var fileStream = await blobStorage.GetAsync(file.BlobRef, cancellationToken);
+        return new FileStreamResult(fileStream, file.MimeType)
+        {
+            FileDownloadName = file.Name,
+        };
     }
 }

@@ -37,8 +37,11 @@ public class SecretsController : ControllerBase
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [AllowAnonymous]
-    public async Task<GetSecretContentCommandResult> GetSecretContent(Guid id, CancellationToken cancellationToken)
-        => await mediator.Send(new GetSecretContentCommand { SecretLinkId = id }, cancellationToken);
+    public async Task<IActionResult> GetSecretContent(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetSecretContentCommand { SecretLinkId = id }, cancellationToken);
+        return result.FileStream ?? (IActionResult)Content(result.TextContent ?? string.Empty);
+    }
 
     /// <summary>
     /// Get secret links for current user.

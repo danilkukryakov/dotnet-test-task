@@ -10,13 +10,15 @@ namespace SecretsSharing.UseCases.Secrets.DeleteSecret;
 internal class DeleteSecretCommandHandler : AsyncRequestHandler<DeleteSecretCommand>
 {
     private readonly IAppDbContext dbContext;
+    private readonly IBlobStorage blobStorage;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public DeleteSecretCommandHandler(IAppDbContext dbContext)
+    public DeleteSecretCommandHandler(IAppDbContext dbContext, IBlobStorage blobStorage)
     {
         this.dbContext = dbContext;
+        this.blobStorage = blobStorage;
     }
 
     /// <inheritdoc />
@@ -57,6 +59,7 @@ internal class DeleteSecretCommandHandler : AsyncRequestHandler<DeleteSecretComm
         if (fileSecret != null)
         {
             dbContext.SecretFiles.Remove(fileSecret);
+            await blobStorage.RemoveAsync(fileSecret.BlobRef, cancellationToken);
         }
     }
 }
