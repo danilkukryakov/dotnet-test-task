@@ -11,26 +11,36 @@ internal class CreateFileSecretCommandHandler : IRequestHandler<CreateFileSecret
 {
     private readonly IAppDbContext dbContext;
     private readonly ICurrentUserAccessor currentUserAccessor;
+    private readonly IBlobStorage blobStorage;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    public CreateFileSecretCommandHandler(IAppDbContext dbContext, ICurrentUserAccessor currentUserAccessor)
+    public CreateFileSecretCommandHandler(IAppDbContext dbContext, ICurrentUserAccessor currentUserAccessor,
+        IBlobStorage blobStorage)
     {
         this.dbContext = dbContext;
         this.currentUserAccessor = currentUserAccessor;
+        this.blobStorage = blobStorage;
     }
 
     /// <inheritdoc />
     public async Task<CreateFileSecretCommandResult> Handle(CreateFileSecretCommand request, CancellationToken cancellationToken)
     {
-        // TODO: Add file upload.
-        var mockBlobRef = string.Empty;
+        var mimeType = request.FileSecretDto.File.ContentType;
+        var mockBlobRef = blobStorage.GenerateBlobKey(mimeType);
+
+        try
+        {
+            await blobStorage.PostAsync(mockBlobRef, request.FileSecretDto.File.OpenReadStream(), true, cancellationToken);
+        } catch {
+            throw new Exception("Can't upload file.");
+        }
 
         var newSecret = new SecretFile
         {
             Name = request.FileSecretDto.File.FileName,
-            MimeType = request.FileSecretDto.File.ContentType,
+            MimeType = mimeType,
             BlobRef = mockBlobRef,
         };
         await dbContext.SecretFiles.AddAsync(newSecret, cancellationToken);

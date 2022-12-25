@@ -46,6 +46,7 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
             {
                 SecretLinkId = link.Id
             }, CancellationToken.None);
+            // TODO: Add file remove from S3.
         }
 
         return result;
@@ -61,6 +62,7 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
         }
         else if (link.SecretType == SecretType.File)
         {
+            // TODO: Add S3 download link generation here.
             resultContent = (await dbContext.SecretFiles.FindAsync(new object?[] { link.SecretId, cancellationToken }, cancellationToken: cancellationToken))?.BlobRef;
         }
 

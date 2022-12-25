@@ -4,8 +4,8 @@ services:
   ###
   # Postgres main database
   postgres:
-    hostname: secretsh-sharing-db
-    container_name: secretsh-sharing-db
+    hostname: secrets-sharing-db
+    container_name: secrets-sharing-db
     image: postgres:15.1
     ports:
       - "5432:5432"
@@ -13,3 +13,21 @@ services:
       - POSTGRES_DB=test
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=1
+    volumes:
+      - .data/pgdata:/var/lib/postgresql/data
+
+  ###
+  # S3 Blob emulator
+  s3:
+    hostname: secrets-sharing-s3
+    container_name: secrets-sharing-s3
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    image: tobi312/minio:RELEASE.2022-12-12T19-27-27Z
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    volumes:
+      - .data/minio:/data:rw
+    command:  ["server", "--address", ":9000", "--console-address", ":9001", "/data"]

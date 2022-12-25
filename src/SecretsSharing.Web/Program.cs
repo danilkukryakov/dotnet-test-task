@@ -34,8 +34,10 @@ builder.Services.AddAuthentication(options =>
 // Database services.
 builder.Services.AddDbContext<AppDbContext>(
     new DbContextOptionsSetup(builder.Configuration.GetConnectionString("AppDatabase")).Setup);
+builder.Services.AddAsyncInitializer<DatabaseInitializer>();
 
 // Other dependencies.
+ApplicationModule.Register(builder.Services, builder.Configuration);
 SystemModule.Register(builder.Services);
 MediatRModule.Register(builder.Services);
 
