@@ -4,6 +4,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Amazon.S3.Util;
+using SecretsSharing.Domain.Exceptions;
 using SecretsSharing.Infrastructure.Abstractions;
 
 namespace SecretsSharing.Infrastructure.Implementation;
@@ -41,7 +42,7 @@ public class S3FileStorage : IBlobStorage, IDisposable
         }
         else
         {
-            throw new Exception("Service URL was not provided.");
+            throw new DomainException("Service URL was not provided.");
         }
 
         if (!string.IsNullOrEmpty(settings.AccessKey))
@@ -51,7 +52,7 @@ public class S3FileStorage : IBlobStorage, IDisposable
         }
         else
         {
-            throw new Exception("AccessKey and SecretKey were not provided.");
+            throw new DomainException("AccessKey and SecretKey were not provided.");
         }
     }
 
@@ -70,7 +71,7 @@ public class S3FileStorage : IBlobStorage, IDisposable
                 return false;
             }
 
-            throw new Exception("Cannot get object metadata.", ex);
+            throw new DomainException("Cannot get object metadata.", ex);
         }
     }
 
@@ -112,7 +113,7 @@ public class S3FileStorage : IBlobStorage, IDisposable
         }
         catch (HttpRequestException exception)
         {
-            throw new Exception("External data storage is not available.", exception);
+            throw new DomainException("External data storage is not available.", exception);
         }
     }
 

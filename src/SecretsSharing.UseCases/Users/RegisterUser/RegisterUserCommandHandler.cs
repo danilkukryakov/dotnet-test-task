@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SecretsSharing.Domain.Entities;
+using SecretsSharing.Domain.Exceptions;
 using SecretsSharing.Infrastructure.Abstractions;
 
 namespace SecretsSharing.UseCases.Users.RegisterUser;
@@ -36,8 +37,7 @@ internal class RegisterUserCommandHandler : AsyncRequestHandler<RegisterUserComm
 
         if (!result.Succeeded)
         {
-            // TODO: Add correct errors display.
-            throw new Exception("Can not register new user.");
+            throw new DomainException("Can not register new user.");
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using SecretsSharing.Domain.Entities;
+using SecretsSharing.Domain.Exceptions;
 using SecretsSharing.Infrastructure.Abstractions;
 
 namespace SecretsSharing.UseCases.Users.LoginUser;
@@ -38,7 +39,7 @@ internal class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Login
         var user = await signInManager.UserManager.FindByEmailAsync(request.LoginUser.Email);
         if (user == null)
         {
-            throw new Exception("Email or password is incorrect.");
+            throw new DomainException("Email or password is incorrect.");
         }
 
         // Combine refresh token with user id.
@@ -58,13 +59,13 @@ internal class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Login
         {
             if (signInResult.IsNotAllowed)
             {
-                throw new Exception($"User {email} is not allowed to Sign In.");
+                throw new DomainException($"User {email} is not allowed to Sign In.");
             }
             if (signInResult.IsLockedOut)
             {
-                throw new Exception($"User {email} is locked out.");
+                throw new DomainException($"User {email} is locked out.");
             }
-            throw new Exception("Email or password is incorrect.");
+            throw new DomainException("Email or password is incorrect.");
         }
     }
 }

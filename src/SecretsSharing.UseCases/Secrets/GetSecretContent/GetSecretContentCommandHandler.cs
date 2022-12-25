@@ -3,6 +3,7 @@ using SecretsSharing.Infrastructure.Abstractions;
 using SecretsSharing.Domain.Entities;
 using SecretsSharing.UseCases.Secrets.DeleteSecret;
 using Microsoft.AspNetCore.Mvc;
+using SecretsSharing.Domain.Exceptions;
 
 namespace SecretsSharing.UseCases.Secrets.GetSecretContent;
 
@@ -32,7 +33,7 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
         var link = await dbContext.Links.FindAsync(new object?[] { request.SecretLinkId, cancellationToken }, cancellationToken: cancellationToken);
         if (link == null)
         {
-            throw new NullReferenceException();
+            throw new NotFoundException("Link was not found.");
         }
 
         var result = new GetSecretContentCommandResult
@@ -81,7 +82,7 @@ internal class GetSecretContentCommandHandler : IRequestHandler<GetSecretContent
 
         if (file == null)
         {
-            throw new Exception("File not found.");
+            throw new NotFoundException("File not found.");
         }
 
         var fileStream = await blobStorage.GetAsync(file.BlobRef, cancellationToken);

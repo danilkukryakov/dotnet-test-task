@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using SecretsSharing.Domain.Entities;
 using SecretsSharing.Infrastructure.DataAccess;
 using SecretsSharing.Web.Infrastructure.DependencyInjection;
+using SecretsSharing.Web.Infrastructure.Middleware;
 using SecretsSharing.Web.Infrastructure.Startup;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Custom middleware.
+app.UseMiddleware<ApiExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 

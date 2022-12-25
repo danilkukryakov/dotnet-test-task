@@ -1,5 +1,6 @@
 using MediatR;
 using SecretsSharing.Domain.Entities;
+using SecretsSharing.Domain.Exceptions;
 using SecretsSharing.Infrastructure.Abstractions;
 
 namespace SecretsSharing.UseCases.Secrets.CreateFileSecret;
@@ -36,7 +37,7 @@ internal class CreateFileSecretCommandHandler : IRequestHandler<CreateFileSecret
         }
         catch
         {
-            throw new Exception("Can't upload file.");
+            throw new DomainException("Can't upload file.");
         }
 
         var newSecret = new SecretFile
