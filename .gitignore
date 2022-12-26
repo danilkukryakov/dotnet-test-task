@@ -343,7 +343,7 @@ healthchecksdb
 *.bak
 Config.ps1
 web.config
-appsettings.Development.json
+# appsettings.Development.json
 firestore.Development.json
 .data
 
